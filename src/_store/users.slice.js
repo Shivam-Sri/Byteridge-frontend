@@ -21,7 +21,8 @@ export const usersReducer = slice.reducer;
 function createInitialState() {
     return {
         list: null,
-        item: null
+        item: null,
+        auditList: null
     }
 }
 
@@ -33,7 +34,8 @@ function createExtraActions() {
         getAll: getAll(),
         getById: getById(),
         update: update(),
-        delete: _delete()
+        delete: _delete(),
+        getAuditList: getAuditList(),
     };
 
     function register() {
@@ -50,6 +52,12 @@ function createExtraActions() {
         );
     }
 
+    function getAuditList() {
+        return createAsyncThunk(
+            `${name}/audit`,
+            async () => await fetchWrapper.get(`${baseUrl}/audit`)
+        );
+    }
 
     function getById() {
         return createAsyncThunk(
@@ -99,6 +107,7 @@ function createExtraReducers() {
         getAll();
         getById();
         _delete();
+        getAuditList();
 
         function getAll() {
             var { pending, fulfilled, rejected } = extraActions.getAll;
@@ -111,6 +120,20 @@ function createExtraReducers() {
                 })
                 .addCase(rejected, (state, action) => {
                     state.list = { error: action.error };
+                });
+        }
+
+        function getAuditList() {
+            var { pending, fulfilled, rejected } = extraActions.getAuditList;
+            builder
+                .addCase(pending, (state) => {
+                    state.auditList = { loading: true };
+                })
+                .addCase(fulfilled, (state, action) => {
+                    state.auditList = { value: action.payload };
+                })
+                .addCase(rejected, (state, action) => {
+                    state.auditList = { error: action.error };
                 });
         }
 

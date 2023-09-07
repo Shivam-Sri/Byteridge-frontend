@@ -4,7 +4,7 @@ import { history } from '_helpers';
 import { Nav, Alert, PrivateRoute } from '_components';
 import { Home } from 'home';
 import { AccountLayout } from 'account';
-import { UsersLayout } from 'users';
+import { UsersLayout, AuditList } from 'users';
 
 
 export { App };
@@ -25,6 +25,7 @@ function App() {
                     <Route element={<PrivateRoute />}>
                         <Route path="/" element={<Home />} />
                         <Route path="users/*" element={<UsersLayout />} />
+                        <Route path="audit" element={<AuditList />} />
                     </Route>
                     {/* public */}
                     <Route path="account/*" element={<AccountLayout />} />

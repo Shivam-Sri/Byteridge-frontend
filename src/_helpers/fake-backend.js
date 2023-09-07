@@ -72,6 +72,11 @@ function fakeBackend() {
                 return ok(basicDetails(user));
             }
 
+            function getAudits() {
+                if (!isAuditor()) return unauthorized();
+                return ok(users.map(x => auditDetails(x)));
+            }
+
             function updateUser() {
                 if (!isAuthenticated()) return unauthorized();
 
@@ -122,8 +127,17 @@ function fakeBackend() {
                 return { id, username, firstName, lastName };
             }
 
+            function auditDetails(user) {
+                const { id, username, firstName, lastName, lastLogin, lastLogout } = user;
+                return { id, username, firstName, lastName, lastLogin, lastLogout };
+            }
+
             function isAuthenticated() {
                 return opts.headers['Authorization'] === 'Bearer fake-jwt-token';
+            }
+
+            function isAuditor() {
+                return (JSON.parse(localStorage.getItem('auth')).role == 'Auditor' ? true : false);
             }
 
             function body() {
@@ -133,6 +147,11 @@ function fakeBackend() {
             function idFromUrl() {
                 const urlParts = url.split('/');
                 return parseInt(urlParts[urlParts.length - 1]);
+            }
+
+            function logout() {
+                if (!isAuthenticated()) return unauthorized();
+                return ok({ message: 'Logged out successfully' });
             }
 
             function headers() {

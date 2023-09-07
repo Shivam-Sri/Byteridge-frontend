@@ -35,7 +35,10 @@ function Register() {
     async function onSubmit(data) {
         dispatch(alertActions.clear());
         try {
-            await dispatch(userActions.register(data)).unwrap();
+            const { firstName, lastName, username, password, role } = data;
+            const user = { firstName, lastName, username, password, role };
+
+            await dispatch(userActions.register(user)).unwrap();
 
             // redirect to login page and display success alert
             history.navigate('/account/login');
@@ -75,6 +78,7 @@ function Register() {
                         <label className="form-label">Role</label>
                         <select name="role" type="" {...register('role')} className={`form-control ${errors.role ? 'is-invalid' : ''}`} >
                             <option value="User" selected={true}>User</option>
+                            <option value="Auditor">Auditor</option>
                         </select>
                         <div className="invalid-feedback">{errors.role?.message}</div>
                     </div>

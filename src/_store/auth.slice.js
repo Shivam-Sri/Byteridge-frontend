@@ -70,9 +70,16 @@ function createExtraActions() {
     function logout() {
         return createAsyncThunk(
             `${name}/logout`,
-            function (arg, { dispatch }) {
-                dispatch(authActions.setAuth(null));
-                localStorage.removeItem('auth');
+            async function (args, { dispatch }) {
+                const authData = JSON.parse(localStorage.getItem('auth'));
+                dispatch(alertActions.clear());
+                try {
+                    fetchWrapper.post(`${baseUrl}/logout`, { authData });
+                    dispatch(authActions.setAuth(null));
+                    localStorage.removeItem('auth');
+                } catch (error) {
+                    dispatch(alertActions.error(error));
+                }
                 history.navigate('/account/login');
             }
         );

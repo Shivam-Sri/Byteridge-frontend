@@ -9,10 +9,19 @@ export const fetchWrapper = {
 
 function request(method) {
     return (url, body) => {
-        const requestOptions = {
-            method,
-            headers: authHeader(url)
-        };
+        let requestOptions = {};
+        if (!url.includes('/audit')) {
+            requestOptions = {
+                method,
+                headers: authHeader(url)
+            };
+        }
+        else {
+            requestOptions = {
+                method,
+                headers: authAuditor(url)
+            };
+        }
         if (body) {
             requestOptions.headers['Content-Type'] = 'application/json';
             requestOptions.body = JSON.stringify(body);
@@ -30,6 +39,19 @@ function authHeader(url) {
     const isApiUrl = url.startsWith(process.env.REACT_APP_API_URL);
     if (isLoggedIn && isApiUrl) {
         return { Authorization: `Bearer ${token}` };
+    } else {
+        return {};
+    }
+}
+
+function authAuditor(url) {
+    // return auth header with jwt if user is logged in and request is to the api url
+    const token = authToken();
+    const { role, _id } = JSON.parse(localStorage.getItem('auth'))
+    const isLoggedIn = !!token;
+    const isApiUrl = url.startsWith(process.env.REACT_APP_API_URL);
+    if (isLoggedIn && isApiUrl) {
+        return { Authorization: `Bearer ${token}`, role: role, id: _id };
     } else {
         return {};
     }
